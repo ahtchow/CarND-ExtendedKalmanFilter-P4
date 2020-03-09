@@ -15,7 +15,7 @@ Once the install for uWebSocketIO is complete, the main program can be built and
 4. make
 5. ./ExtendedKF
 
-#About The Project
+# About The Project
 
 The architecture for the construction of the Kalman Filter is based on the following flow chart.
 
@@ -56,7 +56,7 @@ kalman_filter.cpp- implementation of the Predict and Update function, for both l
 tools.cpp - tool functions to calculate RMSE and the Jacobian matrix, used to convert polar to cartesian coordinates
 
 
-#Results
+# Results
 
 The success metrics for this project are the RMSE values for 2 datasets.
 
