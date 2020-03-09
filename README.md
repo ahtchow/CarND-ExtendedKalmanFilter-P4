@@ -1,7 +1,7 @@
-# Extended Kalman Filter Project Starter Code
+# Extended Kalman Filter Project 
 Self-Driving Car Engineer Nanodegree Program
 
-In this project you will utilize a kalman filter to estimate the state of a moving object of interest with noisy lidar and radar measurements. Passing the project requires obtaining RMSE values that are lower than the tolerance outlined in the project rubric. 
+The following project will utilize a kalman filter to estimate the state of a moving object of interest with noisy lidar and radar measurements. Passing the project requires obtaining RMSE values that are lower than the tolerance outlined. 
 
 This project involves the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases).
 
@@ -15,33 +15,91 @@ Once the install for uWebSocketIO is complete, the main program can be built and
 4. make
 5. ./ExtendedKF
 
-Tips for setting up your environment can be found in the classroom lesson for this project.
+#About The Project
 
-Note that the programs that need to be written to accomplish the project are src/FusionEKF.cpp, src/FusionEKF.h, kalman_filter.cpp, kalman_filter.h, tools.cpp, and tools.h
+The architecture for the construction of the Kalman Filter is based on the following flow chart.
 
-The program main.cpp has already been filled out, but feel free to modify it.
+![alt text](imgs/KalmanFilterFlowChart.png)
 
-Here is the main protocol that main.cpp uses for uWebSocketIO in communicating with the simulator.
+The input data are from two sensors, LiDAR and RADAR. From the continious feed of data the kalman filter will:
+
+1. Initialize State and Covariance Matrixes
+
+Then Loop for:
+
+2. Predict the next position
+3. Update State based on new measurements.
+
+In the process of performing the task, the state positions in x-y coordinate are extracted from the LiDAR and the state positions are extracted in polar form for the Radar.
+
+As a result, we are processing:
+
+Lidar:
+
+1. Px: X position
+2. Py: Y position
+
+Radar:
+
+1. RANGE: ρ (rho) the radial (shortest) distance to the obbject
+2. BEARING: φ (phi) is the angle from cars straight line view
+3. RADIAL VELOCITY: ρ. (rho dot) is the change in ρ
+
+Thus we will convert to radar data to (x,y) coordinates in order to process under the same domain. This is done by using a Jacobian Matrix as shown in the source code.
 
 
-**INPUT**: values provided by the simulator to the c++ program
+The main changes were to the folowing files:
 
-["sensor_measurement"] => the measurement that the simulator observed (either lidar or radar)
+main.cpp - reads in data, runs the Kalman filter and calculates RMSE values after each measurement.
+FusionEKF.cpp - initializes the filter, calls the Predict function and the Update function
+kalman_filter.cpp- implementation of the Predict and Update function, for both lidar and radar.
+tools.cpp - tool functions to calculate RMSE and the Jacobian matrix, used to convert polar to cartesian coordinates
 
 
-**OUTPUT**: values provided by the c++ program to the simulator
+#Results
 
-["estimate_x"] <= kalman filter estimated position x
+The success metrics for this project are the RMSE values for 2 datasets.
 
-["estimate_y"] <= kalman filter estimated position y
+The values should be less than:
 
-["rmse_x"]
+| RMSE | Requirements |
+|------|--------------|
+| Px/Py | 0.11 |
+| Vx/Vy | 0.52 |
 
-["rmse_y"]
+Below will be images with markings of the predicted state and sensor data.
 
-["rmse_vx"]
+1. Red Markings - LIDAR DATA
+2. Blue Markings - RADAR DATA
+3. Green Markings - PREDICTED STATE
 
-["rmse_vy"]
+The following results achieved were:
+
+### Run 1
+
+![alt text](imgs/Dataset1.png)
+
+| RMSE | Results |
+|------|--------------|
+| Px | 0.0973 |
+| Py | 0.0855 |
+| Vx | 0.4513 |
+| Vy | 0.4399 |
+
+Result: PASS
+
+### Run 2
+
+![alt text](imgs/Dataset2.png)
+
+| RMSE | Results |
+|------|--------------|
+| Px | 0.0726 |
+| Py | 0.0965 |
+| Vx | 0.4219 |
+| Vy | 0.4937 |
+
+Result: PASS
 
 ---
 
@@ -78,57 +136,3 @@ using the following settings:
 ## Code Style
 
 Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
-
-## Generating Additional Data
-
-This is optional!
-
-If you'd like to generate your own radar and lidar data, see the
-[utilities repo](https://github.com/udacity/CarND-Mercedes-SF-Utilities) for
-Matlab scripts that can generate additional data.
-
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
-
-More information is only accessible by people who are already enrolled in Term 2 (three-term version) or Term 1 (two-term version)
-of CarND. If you are enrolled, see the Project Resources page in the classroom
-for instructions and the project rubric.
-
-## Hints and Tips!
-
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
-* Students have reported rapid expansion of log files when using the term 2 simulator.  This appears to be associated with not being connected to uWebSockets.  If this does occur,  please make sure you are conneted to uWebSockets. The following workaround may also be effective at preventing large log files.
-
-    + create an empty log file
-    + remove write permissions so that the simulator can't write to log
- * Please note that the ```Eigen``` library does not initialize ```VectorXd``` or ```MatrixXd``` objects with zeros upon creation.
-
-## Call for IDE Profiles Pull Requests
-
-Help your fellow students!
-
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
-
-However! We'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Regardless of the IDE used, every submitted project must
-still be compilable with cmake and make.
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
